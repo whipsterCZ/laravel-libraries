@@ -23,7 +23,7 @@ class SnakePaginator extends LengthAwarePaginator {
 			$pageCount = $this->lastPage();
 
 			if ($curPage < 4) {
-				for ($page = ($curPage == 1 ? 1 : $curPage - 2); $page <= ($pageCount > 5 ? 5 : $pageCount); $page++) {
+				for ($page = 1; $page <= ($pageCount > 5 ? 5 : $pageCount); $page++) {
 					$links .= $this->getPageWrapper($page);
 				}
 			} else {

@@ -6,26 +6,27 @@
  *
  */
 
+echo '<pre>   ______
+  / ____/___  ____ ___  ____  ____  ________  _____
+ / /   / __ \/ __ `__ \/ __ \/ __ \/ ___/ _ \/ ___/
+/ /___/ /_/ / / / / / / /_/ / /_/ (__  )  __/ /
+\____/\____/_/ /_/ /_/ .___/\____/____/\___/_/  INSTALL
+                    /_/
+
+';
+
+
 //Access Check - TODO! implement better solution - i.e. IP whitelist
 date_default_timezone_set('CET');
 if( @$_GET['date']==!date('Y-m-d',time()) ) {
     die('Access Denied - security token not provided');
 }
 
-echo '<pre>   ______
-  / ____/___  ____ ___  ____  ____  ________  _____
- / /   / __ \/ __ `__ \/ __ \/ __ \/ ___/ _ \/ ___/
-/ /___/ /_/ / / / / / / /_/ / /_/ (__  )  __/ /
-\____/\____/_/ /_/ /_/ .___/\____/____/\___/_/  UPDATE
-                    /_/
-
-';
-
 //Configuration
 define('ROOT_DIR',realpath('../'));
 define('EXTRACT_DIRECTORY', ROOT_DIR. '/storage/composer');
 define('HOME_DIRECTORY', ROOT_DIR. '/storage/composer/home');
-define('COMPOSER_INITED', file_exists(ROOT_DIR.'/vendor'));
+define('COMPOSER_INSTALLED', file_exists(ROOT_DIR.'/vendor'));
 set_time_limit(100);
 ini_set('memory_limit',-1);  //could be forbidden on server
 if (!getenv('HOME') && !getenv('COMPOSER_HOME')) {  putenv("COMPOSER_HOME=".HOME_DIRECTORY);  }
@@ -53,13 +54,13 @@ use Symfony\Component\Console\Input\ArrayInput;
 
 
 //Create the commands
-$args = array('command' => 'update');
-if(!COMPOSER_INITED) {
+if(!COMPOSER_INSTALLED) {
     echo "This is first composer run: --no-scripts option is applies\n";
-    $args['--no-scripts']=true;
+    $args = array('command'=>'install','--no-scripts'=>true);
+} else {
+    $args = array('command'=>'install');
 }
 $input = new ArrayInput($args);
-
 
 //Create the application and run it with the commands
 $application = new Application();

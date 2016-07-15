@@ -27,7 +27,7 @@ define('HOME_DIRECTORY', ROOT_DIR. '/storage/composer/home');
 define('COMPOSER_INITED', file_exists(ROOT_DIR.'/vendor'));
 
 set_time_limit(100);
-ini_set('memory_limit',-1);
+ini_set('memory_limit',-1);  //could be forbidden on server
 
 if (!getenv('HOME') && !getenv('COMPOSER_HOME')) {
     putenv("COMPOSER_HOME=".HOME_DIRECTORY);
@@ -67,6 +67,7 @@ $input = new ArrayInput($args);
 
 //Create the application and run it with the commands
 $application = new Application();
+$application->setAutoExit(false);
 $application->run($input);
 
-echo "\n\nDone</pre>";
+echo "Done</pre>";

@@ -34,13 +34,17 @@ class POEditorController extends Controller
 			    $locale->localUpdated =  $stats->updated ? new Carbon($stats->updated) : null;
 			    $locale->updated = new Carbon($stats->updated);
 			    $locale->shouldUpdate = $locale->localUpdated && $locale->localUpdated->lte($locale->updated);
+                $locale->id = $POEditorApiService->getLocaleId($locale->code,true);
+                $locale->translationsLink = $locale->id ? $POEditorApiService->getLinkToTranslations($locale->id) : false;
 		    }
 	//	    dd($locales);
+            $termLink = $POEditorApiService->getLinkToTerms();
 	    }
 
-	    $reservedDomains = $POEditorApiService->getReservedDomains();
+        $addMissingTerms = config('services.poeditor.add_missing_terms');
+        $reservedDomains = $POEditorApiService->getReservedDomains();
 
-	    return view('admin.poeditor',compact('apiToken','projectId','locales','reservedDomains'));
+	    return view('poeditor',compact('apiToken','projectId','locales','reservedDomains','termLink','addMissingTerms'));
     }
 
 
@@ -55,7 +59,7 @@ class POEditorController extends Controller
 			$POEditorApiService->updateAll();
 
 			\Session::flash('success',trans('messages.poeditor.dataUpdated'));
-			return \Response::redirectToRoute('admin.poeditor.index');
+			return \Response::redirectToRoute('poeditor.index');
 
 		} catch (\Exception $e) {
 			return \Response::json(array('status' => 'error', 'message' => $e->getMessage()));
@@ -74,11 +78,39 @@ class POEditorController extends Controller
 			$POEditorApiService->updateLocale($language);
 
 			\Session::flash('success',trans('messages.poeditor.dataUpdated'));
-			return \Response::redirectToRoute('admin.poeditor.index');
+			return \Response::redirectToRoute('poeditor.index');
 
 		} catch (\Exception $e) {
 			return \Response::json(array('status' => 'error', 'message' => $e->getMessage()));
 		}
 		return \Response::json(array('status' => 'success', 'message' => $POEditorApiService->getProjectLanguages()->list));
 	}
+
+    public function showTerms(){
+        return redirect('https://poeditor.com/projects/view_terms?per_page=5&id='.config('services.poeditor.project_id'));
+    }
+    public function showEnTranslations(){
+        return redirect('https://poeditor.com/projects/po_edit?order=ut&id_language=189&id='.config('services.poeditor.project_id'));
+    }
+    public function showCsTranslations(){
+        return redirect('https://poeditor.com/projects/po_edit?order=ut&id_language=38&id='.config('services.poeditor.project_id'));
+    }
+
+    public function showPoeditorLinks(){
+        $links = [
+            'update-all'=>route('poeditor.updateAll'),
+            'show terms' => route('poeditor.terms'),
+            'show cs-translations' => route('poeditor.cs'),
+            'show en-translations' => route('poeditor.en'),
+        ];
+        $html = [];
+        foreach ($links as $label => $link) {
+            $html[] = link_to($link,$label,['target'=>'_blank']);
+        }
+        return "<h1>Poeditor</h1>".implode("<br/>",$html);
+    }
+
+    public function addMissingTerm($term, $translationCs = null,$translationEn = null){
+
+    }
 }

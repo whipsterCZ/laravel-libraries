@@ -9,6 +9,7 @@ use \Exception;
 class POEditorApiService
 {
 	protected $apiUrl = "http://poeditor.com/api/";
+    protected $webUrl = "http://poeditor.com/";
 
 	protected $apiToken;
 	protected $projectId;
@@ -143,6 +144,9 @@ class POEditorApiService
 
 		foreach ($data as $dataItem) {
 			$itemKey = explode(".", $dataItem->term);
+            if (count($itemKey) != 2) {
+                throw new \Exception(sprintf('Term `%s` has to have one domain  - example homepage.header', $dataItem->term));
+            };
 			$filename = $itemKey[0];
 			$term = $itemKey[1];
 			$statCount++;
@@ -432,7 +436,92 @@ class POEditorApiService
 		return $this;
 	}
 
+    /**
+     * @return string
+     */
+    public function getWebUrl($page = null,$attrs = [])
+    {
+        $link = $this->webUrl;
+        if($page) {
+            $link .= $page;
+        }
+        if(count($attrs)) {
+            $link .= "?". http_build_query($attrs);
+        }
+        return $link;
+    }
 
+    public function getLinkToTerms($perPage = 5){
+        return $this->getWebUrl('projects/view_terms', [
+            'id' => $this->projectId,
+            'per_page' => $perPage,
+        ]);
+    }
+
+    public function getLinkToTranslations($languageId){
+        return $this->getWebUrl('projects/po_edit',[
+            'id'=> $this->projectId,
+            'order' => 'ut',
+            'id_language' => $languageId
+        ]);
+    }
+
+    public function getLinkToCsTranslations(){
+        return $this->getLinkToTranslations('cs');
+    }
+
+    public function getLinkToEnTranslations()  {
+        return $this->getLinkToTranslations('en');
+    }
+
+    public function getLocaleId($code,$ignoreError = false){
+        $map = [
+            'cs' => 38,
+            'en' => 43,
+            'en-us' => 189,
+            'de' => 55,
+            'pl' => 127,
+            'ru' => 134,
+        ];
+        if(isset($map[$code])) {
+            return $map[$code];
+        }
+        if($ignoreError) {
+            return false;
+        }
+        throw new \Exception(sprintf('language with code `%s` was not found',$code));
+    }
+
+
+    public function addMissingTerm($term, $comment = '',$plural = '',$context = ''){
+        $termObject = [
+            'term'=>$term,
+            'context'=> $context,
+            'reference' => '',
+            'plural'=> $plural,
+            'comment' =>  $comment,
+        ];
+        $json = json_encode([$termObject]);
+        return $this->doRequest([ 'action' => 'add_terms','data'=> $json]);
+    }
+
+    public function setTranslation($term,$translation,$localeCode, $context =''){
+        $translationObject = [
+            'term' => (object)[
+                'term'    => $term,
+                'context' => $context,
+            ],
+            'definition' => [
+                'forms' => [
+                    $translation
+                ],
+                'fuzzy' => '0'
+            ]
+        ];
+        $json = json_encode([$translationObject]);
+//        dd($json);
+        return $this->doRequest(['action'=> 'update_language','language'=>$localeCode, 'data'=> $json]);
+    }
 
 
 }

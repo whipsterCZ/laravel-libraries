@@ -1,0 +1,15 @@
+<?php
+
+return [
+	'menu' => '@Models',
+    'entities' => '@Models',
+    'entity' => '@Model',
+    'create' => 'Create @entity',
+    'edit' => 'Edit @entity',
+    'delete' => 'Delete @entity',
+    'list' => 'List of @entities',
+    'save' => 'Save @entity',
+    'store_success' => '@Model has been successfully created.',
+    'update_success' => '@Model has been successfully updated.',
+    'delete_success' => '@Model has been deleted!'
+];

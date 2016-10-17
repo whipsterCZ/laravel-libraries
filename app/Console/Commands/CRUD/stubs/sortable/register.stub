@@ -1,0 +1,27 @@
+
+//  Menu Root Node   @ App\Services\AdminMenuFactory.php
+	$menu->add(trans('@messages.menu'),['route' => 'admin.@entities.index'])
+		->data('icon','fa fa-cube')
+		->data('allow', \Gate::allows('index',new \@ModelNamespace\@Model()));
+
+// add Route: @ adminRoutes.php
+	Route::resource('@entities','@ModelsController');
+
+// add Route Model Binding: @ RouteServiceProvider.php
+	$router->model('@entities',\@ModelNamespace\@Model::class);
+
+// register policy by adding line to $policies  @ AuthServiceProvider.php
+	\@ModelNamespace\@Model::class => \App\Policies\@ModelPolicy::class,
+
+// register seeder @ DatabaseSeeder.php
+	$this->call(@ModelSeeder::class);
+
+// register sortable behaviour @ config/sortable.php
+	'@entities' => \@ModelNamespace\@Model::class,
+
+// Run migrations
+	php artisan migrate
+
+// Run DB Seeder
+	php artisan db:seed --class=@ModelSeeder
+

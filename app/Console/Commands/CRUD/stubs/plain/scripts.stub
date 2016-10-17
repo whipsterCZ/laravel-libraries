@@ -1,0 +1,16 @@
+var $ = require('jquery');
+
+// This is module @entities
+module.exports = {
+
+    init: function() {
+
+    },
+    initForm: function(){
+
+    },
+    publicMethod : function() {   }
+
+};
+
+var privateMethod = function(){ };

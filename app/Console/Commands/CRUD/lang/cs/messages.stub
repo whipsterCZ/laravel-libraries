@@ -1,0 +1,15 @@
+<?php
+
+return [
+	'menu' => '@Models',
+	'entities' => '@Models',
+	'entity' => '@entity',
+	'create' => 'Vytvořit @entity',
+	'edit' => 'Upravit @entity',
+	'delete' => 'Smazat @entity',
+	'list' => 'Seznam @entity',
+	'save' => 'Uložit @entity',
+	'store_success' => '@Model byl/a vytvořen/a.',
+	'update_success' => '@Model byl/a upraven/a.',
+	'delete_success' => '@Model byl/a smazán/a!',
+];

@@ -29,17 +29,18 @@ trait Publishable {
 		$dateFromPass = true;
 		$dateToPass = true;
 
-		if( $this->attributes[$fromField] ) {
-			$dateFromPass = date('Y-m-d',strtotime($this->attributes[$fromField])) <= date('Y-m-d',$timestamp);
+        if ( isset($this->{$fromField}) && $this->{$fromField} ) {
+			$dateFromPass = date('Y-m-d',strtotime($this->{$fromField})) <= date('Y-m-d',$timestamp);
 		}
-		if( $this->attributes[$toField] ) {
-			$dateToPass = date('Y-m-d',strtotime($this->attributes[$toField])) >= date('Y-m-d',$timestamp);
+        if ( isset($this->{$toField}) && $this->{$toField} ) {
+			$dateToPass = date('Y-m-d',strtotime($this->{$toField})) >= date('Y-m-d',$timestamp);
 		}
 		return $this->isActive() && $dateFromPass && $dateToPass;
 	}
 
 	public function isActive(){
-		return isset($this->active) ? $this->active : true;
+        $activeField = $this->getActiveField();
+		return isset($this->{$activeField}) ? $this->{$activeField} : true;
 	}
 
 	public function publishedFrom($format = null){
@@ -79,20 +80,25 @@ trait Publishable {
 		return isset(static::$publishedToField) ? static::$publishedToField : 'published_to';
 	}
 
+    public static function getActiveField()	{
+        return isset(static::$activeField) ? static::$activeField : 'active';
+    }
+
 	/**
 	 * Scope a query to only include active users.
 	 *
 	 * @return \Illuminate\Database\Eloquent\Builder
 	 */
 	public function scopePublished($query)	{
+        $activeField = $this->getActiveField();
+        $fromField = $this->getPublishedFromField();
+        $toField = $this->getPublishedToField();
 
-		if ( isset($this->active) ) {
-			$query->where('active',1);
+		if ( $activeField ) {
+			$query->where($activeField,1);
 		}
-		$fromField = $this->getPublishedFromField();
-		$toField = $this->getPublishedToField();
 		$now = date('Y-m-d');
-		if ( $fromField) {
+		if ( $fromField ) {
 			$query->whereRaw("($fromField IS NULL OR DATE($fromField) <= '$now')");
 		}
 		if ( $toField ) {

@@ -9,6 +9,7 @@
 namespace App\Traits;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 
 trait Filter {
@@ -127,6 +128,18 @@ trait Filter {
 		}
 		return \Session::get($key,$default);
 	}
+
+    /**
+     * Set or get ID
+     * @param $key
+     * @param int|Model $value
+     * @param null $default
+     * @return int|null
+     */
+    protected function filterId($key,$value,$default = null)   {
+        if($value instanceof Model) {  $value = $value->id;  }
+        return $this->filterInteger($key,$value,$default) ;
+    }
 
 	/**
 	 * set or get float
